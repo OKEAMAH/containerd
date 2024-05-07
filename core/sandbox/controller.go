@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/containerd/containerd/v2/api/types"
+	"github.com/containerd/containerd/api/types"
 	"github.com/containerd/containerd/v2/core/mount"
 	"github.com/containerd/platforms"
 	"github.com/containerd/typeurl/v2"
@@ -117,6 +117,8 @@ type ControllerInstance struct {
 	SandboxID string
 	Pid       uint32
 	CreatedAt time.Time
+	Address   string
+	Version   uint32
 	Labels    map[string]string
 }
 
@@ -133,4 +135,6 @@ type ControllerStatus struct {
 	CreatedAt time.Time
 	ExitedAt  time.Time
 	Extra     typeurl.Any
+	Address   string
+	Version   uint32
 }

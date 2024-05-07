@@ -19,8 +19,8 @@ package proxy
 import (
 	"context"
 
-	api "github.com/containerd/containerd/v2/api/services/sandbox/v1"
-	"github.com/containerd/containerd/v2/api/types"
+	api "github.com/containerd/containerd/api/services/sandbox/v1"
+	"github.com/containerd/containerd/api/types"
 	"github.com/containerd/containerd/v2/core/mount"
 	"github.com/containerd/containerd/v2/core/sandbox"
 	"github.com/containerd/errdefs"
@@ -73,6 +73,8 @@ func (s *remoteSandboxController) Start(ctx context.Context, sandboxID string) (
 		Pid:       resp.GetPid(),
 		CreatedAt: resp.GetCreatedAt().AsTime(),
 		Labels:    resp.GetLabels(),
+		Address:   resp.GetAddress(),
+		Version:   resp.GetVersion(),
 	}, nil
 }
 
@@ -141,6 +143,8 @@ func (s *remoteSandboxController) Status(ctx context.Context, sandboxID string, 
 		CreatedAt: resp.GetCreatedAt().AsTime(),
 		ExitedAt:  resp.GetExitedAt().AsTime(),
 		Extra:     resp.GetExtra(),
+		Address:   resp.GetAddress(),
+		Version:   resp.GetVersion(),
 	}, nil
 }
 
