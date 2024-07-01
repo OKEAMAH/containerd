@@ -76,12 +76,16 @@ func AdjustOOMScore(pid int) error {
 const socketRoot = defaults.DefaultStateDir
 
 // SocketAddress returns a socket address
-func SocketAddress(ctx context.Context, socketPath, id string) (string, error) {
+func SocketAddress(ctx context.Context, socketPath, id string, debug bool) (string, error) {
 	ns, err := namespaces.NamespaceRequired(ctx)
 	if err != nil {
 		return "", err
 	}
-	d := sha256.Sum256([]byte(filepath.Join(socketPath, ns, id)))
+	path := filepath.Join(socketPath, ns, id)
+	if debug {
+		path = filepath.Join(path, "debug")
+	}
+	d := sha256.Sum256([]byte(path))
 	return fmt.Sprintf("unix://%s/%x", filepath.Join(socketRoot, "s"), d), nil
 }
 
@@ -278,4 +282,20 @@ func dialHybridVsock(address string, timeout time.Duration) (net.Conn, error) {
 		return nil, fmt.Errorf("hybrid vsock port %d is invalid", port)
 	}
 	return hybridVsockDialer(addr, port, timeout)
+}
+
+func cleanupSockets(ctx context.Context) {
+	if address, err := ReadAddress("address"); err == nil {
+		_ = RemoveSocket(address)
+	}
+	if len(socketFlag) > 0 {
+		_ = RemoveSocket("unix://" + socketFlag)
+	} else if address, err := SocketAddress(ctx, addressFlag, id, false); err == nil {
+		_ = RemoveSocket(address)
+	}
+	if len(debugSocketFlag) > 0 {
+		_ = RemoveSocket("unix://" + debugSocketFlag)
+	} else if address, err := SocketAddress(ctx, addressFlag, id, true); err == nil {
+		_ = RemoveSocket(address)
+	}
 }
